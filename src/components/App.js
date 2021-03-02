@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import style from './App.module.css';
 import ContactForm from './contactForm/ContactForm.jsx';
 import ContactsList from './contactsList/ContactsList';
@@ -49,21 +48,36 @@ class App extends Component {
         this.setState({ filter });
     };
 
+    componentDidMount() {
+        const contactList = localStorage.getItem('contactList');
+        const parsedContactList = JSON.parse(contactList);
+        if (parsedContactList) {
+            this.setState({ contactList: parsedContactList });
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.contactList !== prevState.contactList) {
+            localStorage.setItem(
+                'contactList',
+                JSON.stringify(this.state.contactList),
+            );
+        }
+    }
+
     render() {
         const visibleContacts = this.getFilteredContacts();
         return ( <
             div className = { style.container } >
             <
-            h2 > Phonebook < /h2> <
-            ContactForm addContact = { this.addContact }
-            /> <
-            h2 > Contacts < /h2> <
+            h2 > Phonebook < /h2> <ContactForm addContact={this.addContact} / > { ' ' } <
+            h2 > Contacts < /h2>{' '} <
             FilterList filter = { this.state.filter }
             onFilterHandleChange = { this.onFilterHandleChange }
-            /> <
+            />{' '} <
             ContactsList contactList = { visibleContacts }
             onHandleRemove = { this.onHandleRemove }
-            /> <
+            />{' '} <
             /div>
         );
     }
